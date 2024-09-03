@@ -65,7 +65,109 @@ describe('Catalog routes', () => {
             expect(response.status).toBe(500);
             expect(response.body).toEqual("unable to create product");
         });
+    });
+
+    describe("PATCH /product/:id", () => {
+        test('Should product update successfully', async () => {
+            const product = ProductFactory.build();
+            const requestBody = {
+                name: product.name,
+                price: product.price,
+                stock: product.stock,
+            };
+
+            jest.spyOn(catalogService, "updateProduct")
+                .mockImplementationOnce(() => Promise.resolve(product));
+
+            const response = await request(app)
+                .patch(`/product/${product.id}`)
+                .send(requestBody)
+                .set("Accept", "application/json");
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(product);
+        });
+
+        test("should response with an internal error code 500", async () => {
+            const product = ProductFactory.build();
+            const requestBody = mockRequest();
+            jest
+                .spyOn(catalogService, "updateProduct")
+                .mockImplementationOnce(() =>
+                    Promise.reject(new Error("unable to update product"))
+                );
+            const response = await request(app)
+                .patch(`/product/${product.id}`)
+                .send(requestBody)
+                .set("Accept", "application/json");
+            expect(response.status).toBe(500);
+            expect(response.body).toEqual("unable to update product");
+        });
+
+        test('should response with an internal error code 500', async () => {
+            const product = ProductFactory.build();
+            const requestBody = mockRequest();
+            jest
+                .spyOn(catalogService, "updateProduct")
+                .mockImplementationOnce(() =>
+                    Promise.reject(new Error("unable to update product"))
+                );
+
+            const response = await request(app)
+                .patch(`/product/${product.id}`)
+                .send(requestBody)
+                .set("Accept", "application/json");
+            expect(response.status).toBe(500);
+            expect(response.body).toEqual("unable to update product");
+        })
+    });
+
+    describe("GET /products?limit=0&offset=0", () => {
+        test("should return a range of products based on limit and offset", async () => {
+            const randomLimit = faker.number.int({ min: 10, max: 50 });
+            const products = ProductFactory.buildList(randomLimit);
+
+            jest
+                .spyOn(catalogService, "getProducts")
+                .mockImplementationOnce(() => Promise.resolve(products));
+
+            const response = await request(app)
+                .get(`/products?limit=${randomLimit}&offset=0`)
+                .set("Accept", "application/json");
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(products);
+        })
     })
+
+    describe('GET /product/:id', () => {
+        test("should return a product by id", async () => {
+            const product = ProductFactory.build();
+            jest
+                .spyOn(catalogService, "getProduct")
+                .mockImplementationOnce(() => Promise.resolve(product));
+            const response = await request(app)
+                .get(`/product/${product.id}`)
+                .set("Accept", "application/json");
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual(product);
+        });
+    });
+
+    describe('DELETE /product/:id', () => {
+        test('should return a product by id', async () => {
+            const product = ProductFactory.build();
+
+            jest.spyOn(catalogService, "deleteProduct")
+                .mockImplementationOnce(() => Promise.resolve({ id: product.id }));
+
+            const response = await request(app)
+                .delete(`/product/${product.id}`)
+                .set("Accept", "application/json");
+
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual({ id: product.id });
+        })
+    })
+
 });
 
 
