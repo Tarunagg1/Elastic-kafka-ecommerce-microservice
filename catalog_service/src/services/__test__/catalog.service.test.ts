@@ -22,14 +22,6 @@ describe("catalogService", () => {
     let repository: ICatalogRepository;
     repository = new MockCatalogRepository();
 
-    // beforeEach(() => {
-    // });
-
-
-    // afterEach(() => {
-    //     repository = {} as MockCatalogRepository;
-    // });
-
     describe("Crateproduct", () => {
         test("should create product", async () => {
             const catalogService = new CatalogService(repository);

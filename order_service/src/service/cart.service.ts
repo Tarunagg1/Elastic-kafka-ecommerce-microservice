@@ -9,7 +9,6 @@ export const CreateCart = async (input: any, repo: CartRepositoryType) => {
 export const GetCart = async (input: any, repo: CartRepositoryType) => {
     const data = await repo.findCart(input);
     return data;
-
 }
 
 export const EditCart = async (input: any, repo: CartRepositoryType) => {

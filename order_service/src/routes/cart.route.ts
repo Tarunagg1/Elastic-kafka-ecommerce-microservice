@@ -7,15 +7,13 @@ const repo = CartRepository;
 
 router.post("/cart", async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const response = await cartService.CreateCart("oji", repo);
+        const response = await cartService.CreateCart(req.body, repo);
         return res.status(200).json(response);
     } catch (error) {
         const err = error as Error;
         return res.status(500).json({ error: err.message });
     }
-})
-
-
+});
 
 router.get("/cart", async (req: Request, res: Response, next: NextFunction) => {
     try {
