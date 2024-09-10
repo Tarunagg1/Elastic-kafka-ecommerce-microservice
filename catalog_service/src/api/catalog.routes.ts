@@ -21,7 +21,6 @@ router.post("/product", async (req: Request, res: Response, next: NextFunction) 
     }
 });
 
-
 router.patch("/product/:id", async (req: Request, res: Response, next) => {
     try {
         const { errors, input } = await RequestValidator(
@@ -40,7 +39,6 @@ router.patch("/product/:id", async (req: Request, res: Response, next) => {
         return res.status(500).json(err.message);
     }
 });
-
 
 router.get("/products", async (req: Request, res: Response, next: NextFunction) => {
     const limit = Number(req.query["limit"]);

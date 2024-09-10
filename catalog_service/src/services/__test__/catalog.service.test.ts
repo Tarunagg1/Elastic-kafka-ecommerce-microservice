@@ -1,6 +1,6 @@
 import { beforeEach, describe } from "node:test";
 import { ICatalogRepository } from "../../interface/catelogRepository.interface"
-import { MockCatalogRepository } from "../../repository/moctCatalog.repository";
+import { MockCatalogRepository } from "../../repository/mockCatalog.repository";
 import { CatalogService } from "../catalog.service";
 import { faker } from "@faker-js/faker";
 import { Product } from "../../models/product.model";
