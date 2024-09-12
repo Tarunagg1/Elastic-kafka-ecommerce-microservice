@@ -10,7 +10,6 @@ const repo = CartRepository;
 router.post("/cart", async (req: Request, res: Response, next: NextFunction) => {
     try {
         const error = Validaterequest<CartRequestInput>(req.body, CartRequestSchema);
-
         if (error) {
             return res.status(404).json({ error });
         }
@@ -18,8 +17,9 @@ router.post("/cart", async (req: Request, res: Response, next: NextFunction) => 
         const response = await cartService.CreateCart(req.body, repo);
         return res.status(200).json(response);
     } catch (error) {
-        const err = error as Error;
-        return res.status(500).json({ error: err.message });
+        next(error);
+        // const err = error as Error;
+        // return res.status(500).json({ error: err.message });
     }
 });
 
@@ -28,8 +28,9 @@ router.get("/cart", async (req: Request, res: Response, next: NextFunction) => {
         const response = cartService.GetCart("oji", repo);
         return res.status(200).json({ message: "create cart" });
     } catch (error) {
-        const err = error as Error;
-        return res.status(500).json({ error: err.message });
+        // const err = error as Error;
+        next(error);
+        // return res.status(500).json({ error: err.message });
     }
 });
 
@@ -39,8 +40,9 @@ router.patch("/cart", async (req: Request, res: Response, next: NextFunction) =>
         const response = cartService.EditCart("oji", repo);
         return res.status(200).json({ message: "create cart" });
     } catch (error) {
-        const err = error as Error;
-        return res.status(500).json({ error: err.message });
+        next(error);
+        // const err = error as Error;
+        // return res.status(500).json({ error: err.message });
     }
 })
 
@@ -50,8 +52,9 @@ router.delete("/cart", async (req: Request, res: Response, next: NextFunction) =
         const response = cartService.DeleteCart("oji", repo);
         return res.status(200).json({ message: "create cart" });
     } catch (error) {
-        const err = error as Error;
-        return res.status(500).json({ error: err.message });
+        next(error);
+        // const err = error as Error;
+        // return res.status(500).json({ error: err.message });
     }
 })
 
@@ -62,8 +65,9 @@ router.post("/clear-cart", async (req: Request, res: Response, next: NextFunctio
         const response = cartService.CreateCart("oji", repo);
         return res.status(200).json({ message: "create cart" });
     } catch (error) {
-        const err = error as Error;
-        return res.status(500).json({ error: err.message });
+        next(error);
+        // const err = error as Error;
+        // return res.status(500).json({ error: err.message });
     }
 })
 
