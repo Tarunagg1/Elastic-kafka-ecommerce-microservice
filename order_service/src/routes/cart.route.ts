@@ -7,7 +7,17 @@ import { CartRequestInput, CartRequestSchema } from "../dto/cartRequest.dto";
 const router = express.Router();
 const repo = CartRepository;
 
-router.post("/cart", async (req: Request, res: Response, next: NextFunction) => {
+const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    // jwt
+    const isValidUser = true;
+    if (!isValidUser) {
+        return res.status(403).json({ error: "authorization error" });
+    }
+    next();
+};
+
+
+router.post("/cart", authMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const error = Validaterequest<CartRequestInput>(req.body, CartRequestSchema);
         if (error) {
@@ -25,8 +35,8 @@ router.post("/cart", async (req: Request, res: Response, next: NextFunction) => 
 
 router.get("/cart", async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const response = cartService.GetCart("oji", repo);
-        return res.status(200).json({ message: "create cart" });
+        const response = await cartService.GetCart(req.body.customerId, repo);
+        return res.status(200).json(response);
     } catch (error) {
         // const err = error as Error;
         next(error);
@@ -35,10 +45,15 @@ router.get("/cart", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 
-router.patch("/cart", async (req: Request, res: Response, next: NextFunction) => {
+router.patch("/cart/:lineItemId", async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const response = cartService.EditCart("oji", repo);
-        return res.status(200).json({ message: "create cart" });
+        const { lineItemId } = req.params;
+        const response = await cartService.EditCart(
+            {
+                id: +lineItemId,
+                qty: req.body.qty,
+            }, repo);
+        return res.status(200).json(response);
     } catch (error) {
         next(error);
         // const err = error as Error;
@@ -47,10 +62,12 @@ router.patch("/cart", async (req: Request, res: Response, next: NextFunction) =>
 })
 
 
-router.delete("/cart", async (req: Request, res: Response, next: NextFunction) => {
+router.delete("/cart/lineItemId", async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const response = cartService.DeleteCart("oji", repo);
-        return res.status(200).json({ message: "create cart" });
+        const { lineItemId } = req.params;
+        console.log(lineItemId);
+        const response = await cartService.DeleteCart(+lineItemId, repo);
+        return res.status(200).json(response);
     } catch (error) {
         next(error);
         // const err = error as Error;
@@ -60,10 +77,11 @@ router.delete("/cart", async (req: Request, res: Response, next: NextFunction) =
 
 
 
-router.post("/clear-cart", async (req: Request, res: Response, next: NextFunction) => {
+router.post("/clear-cart/:id", async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const response = cartService.CreateCart("oji", repo);
-        return res.status(200).json({ message: "create cart" });
+        const { id } = req.params;
+        const response = await cartService.ClearCart(id, repo);
+        return res.status(200).json(response);
     } catch (error) {
         next(error);
         // const err = error as Error;
