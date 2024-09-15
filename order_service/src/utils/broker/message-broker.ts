@@ -2,12 +2,11 @@ import { MessageBrokerType, MessageHadler, PublishType } from "./broket.type";
 import { Consumer, Kafka, logLevel, Partitioners, Producer } from 'kafkajs';
 import fs from 'fs';
 import path from 'path';
-import { TOPIC_TYPE } from "../../types";
+import { MessageType, OrderEvent, TOPIC_TYPE } from "../../types";
 
 const CLIENT_ID = process.env.CLIENT_ID || 'order-service';
 const GROUP_ID = process.env.GROUP_ID || 'order-service-group';
 const BROKERS = [process.env.KAFKA_BROKER];
-
 
 const kafka = new Kafka({
     clientId: CLIENT_ID,
@@ -114,27 +113,33 @@ const subscribe = async  <T>(messageHandler: MessageHadler, topic: TOPIC_TYPE): 
 
     await consumer.subscribe({ topic: topic, fromBeginning: true });
 
-    
+    await consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+            if (topic !== "OrderEvents") {
+                return;
+            }
+
+            if (message.key && message.value) {
+                const inputMessae: MessageType = {
+                    headers: message.headers,
+                    event: message.key.toString() as OrderEvent,
+                    data: message.value ? JSON.parse(message.value.toString()) : null
+                };
+
+                await messageHandler(inputMessae);
+                await consumer.commitOffsets([
+                    { topic, partition, offset: (Number(message.offset) + 1).toString() }
+                ]);
+            }
+        }
+    })
 }
 
 export const MessageBroker: MessageBrokerType = {
-
-    connectProducer: function <T>(): Promise<T> {
-        throw new Error("Function not implemented.");
-    },
-    disconnectProducer: function (): Promise<void> {
-        throw new Error("Function not implemented.");
-    },
-    publish: function (data: PublishType): Promise<boolean> {
-        throw new Error("Function not implemented.");
-    },
-    connectConsumer: function <T>(): Promise<T> {
-        throw new Error("Function not implemented.");
-    },
-    disconnectConsumer: function (): Promise<void> {
-        throw new Error("Function not implemented.");
-    },
-    subscribe: function <T>(messageHandler: MessageHadler, topic: string): Promise<void> {
-        throw new Error("Function not implemented.");
-    }
+    connectProducer,
+    disconnectProducer,
+    publish,
+    connectConsumer,
+    disconnectConsumer,
+    subscribe
 }
