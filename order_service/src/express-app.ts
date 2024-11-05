@@ -14,27 +14,25 @@ export const ExpressApp = async () => {
     app.use(express.json());
     app.use(httpLogger);
 
-    try {
+    // try {
+    //     // Kafka js implementation
+    //     const producer = await MessageBroker.connectProducer<Producer>();
+    //     producer.on('producer.connect', () => {
+    //         console.log('producer connected');
+    //     })
 
-        // Kafka js implementation
-        const producer = await MessageBroker.connectProducer<Producer>();
-        producer.on('producer.connect', () => {
-            console.log('producer connected');
-        })
+    //     const consumer = await MessageBroker.connectConsumer<Consumer>();
+    //     consumer.on('consumer.connect', () => {
+    //         console.log('consumer connected');
+    //     });
 
-        const consumer = await MessageBroker.connectConsumer<Consumer>();
-        consumer.on('consumer.connect', () => {
-            console.log('consumer connected');
-        });
-
-        await MessageBroker.subscribe((message: MessageType) => {
-            console.log('comsumer recive message');
-            console.log('message received', message);
-
-        }, "OrderEvents");
-    } catch (error) {
-        console.log(error);
-    }
+    //     await MessageBroker.subscribe((message: MessageType) => {
+    //         console.log('comsumer recive message');
+    //         console.log('message received', message);
+    //     }, "OrderEvents");
+    // } catch (error) {
+    //     console.log(error);
+    // }
 
 
     app.use(cartRoutes);

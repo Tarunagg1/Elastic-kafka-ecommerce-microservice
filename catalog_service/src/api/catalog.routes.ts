@@ -74,12 +74,26 @@ router.delete("/product/:id", async (req: Request, res: Response, next: NextFunc
     const id = parseInt(req.params.id) || 0;
     try {
         const data = await catalogService.deleteProduct(id);
+        if (!data) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+        return res.status(200).json(data);
+    } catch (error) {
+        console.log(error);
+
+        const err = error as Error;
+        return res.status(500).json(err.message);
+    }
+});
+
+router.post("/products/stock", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const data = await catalogService.getProductStock(req.body.ids);
         return res.status(200).json(data);
     } catch (error) {
         const err = error as Error;
         return res.status(500).json(err.message);
     }
 });
-
 
 export default router;
